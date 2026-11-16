@@ -170,9 +170,9 @@ function syncTemplateName() {
   if (category === "first_en" || category === "fcfs_en") {
     tplInput.value = "confimation2_new-";
   } else if (category === "first_kn" || category === "fcfs_kn") {
-    tplInput.value = "confimation_new_kan-";
+    tplInput.value = "confimation_new_kan";
   } else if (category === "followup") {
-    tplInput.value = "followup_confirmation-";
+    tplInput.value = "followup_confirmation";
   }
 }
 
@@ -190,13 +190,12 @@ function escapeHtml(str) {
 function refreshUI() {
   const allBoxes = [...document.querySelectorAll(".slot-cb")];
   allBoxes.forEach((cb) => {
-    cb.closest(".slot-pill").classList.toggle("active", cb.checked);
+    cb.closest(".slot-checkbox-card").classList.toggle("active", cb.checked);
   });
 
   const selectedSlots = getSelectedSlots();
   const checkedCount = allBoxes.filter((cb) => cb.checked).length;
 
-  // Update badge & toggle button
   document.getElementById("selectedCountBadge").textContent =
     checkedCount === 1
       ? "1 Slot Selected"
@@ -207,7 +206,6 @@ function refreshUI() {
     ? "Clear All"
     : "Select All";
 
-  // Automatically switch to multi preview when user checks > 1 slot
   const slotsToRender =
     previewMode === "single" ? [selectedSlots[0]] : selectedSlots;
 
@@ -247,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("slotsContainer");
   SLOTS.forEach((slot, idx) => {
     const label = document.createElement("label");
-    label.className = `slot-pill ${idx === 0 ? "active" : ""}`;
+    label.className = `slot-checkbox-card ${idx === 0 ? "active" : ""}`;
     label.innerHTML = `<input type="checkbox" class="slot-cb" value="${idx}" ${idx === 0 ? "checked" : ""}> <span>${slot.label}</span>`;
     container.appendChild(label);
   });
@@ -294,7 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Injected function executed once inside each target tab's MAIN world
-// Injected function executed once inside each target tab's MAIN world
 function fillFrappeBulkForm(data) {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -314,7 +311,7 @@ function fillFrappeBulkForm(data) {
     return true;
   }
 
-  // Run without blocking executeScript on background-throttled timers
+  // Non-blocking execution prevents Chrome background tab timer throttling from stalling the loop
   (async () => {
     // 1. Set Title first
     if (window.cur_frm) {
@@ -438,7 +435,6 @@ document.getElementById("fillAll").addEventListener("click", async () => {
   fillAllBtn.disabled = true;
 
   try {
-    // Match any drheal.in tab in the current window whose URL contains bulk-whatsapp
     const allWindowTabs = await chrome.tabs.query({
       currentWindow: true,
       url: "*://*.drheal.in/*",
@@ -480,59 +476,6 @@ document.getElementById("fillAll").addEventListener("click", async () => {
 
     document.getElementById("status").textContent =
       `✓ Filled ${countToFill} of ${tabs.length} form tab(s) (${chosenSlots.length} slot(s) selected).`;
-  } finally {
-    fillAllBtn.disabled = false;
-  }
-});
-
-document.getElementById("fillCurrent").addEventListener("click", async () => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab) return;
-
-  const payload = buildPayload(getSelectedSlots()[0]);
-  await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    world: "MAIN",
-    func: fillFrappeBulkForm,
-    args: [payload],
-  });
-
-  document.getElementById("status").textContent = `✓ Filled: ${payload.title}`;
-});
-
-document.getElementById("fillAll").addEventListener("click", async () => {
-  const fillAllBtn = document.getElementById("fillAll");
-  fillAllBtn.disabled = true;
-
-  try {
-    const tabs = await chrome.tabs.query({
-      currentWindow: true,
-      url: "*://*.drheal.in/app/bulk-whatsapp-message/*",
-    });
-
-    if (!tabs.length) {
-      document.getElementById("status").textContent =
-        "No Bulk WhatsApp tabs found in this window.";
-      return;
-    }
-
-    tabs.sort((a, b) => a.index - b.index);
-
-    const chosenSlots = getSelectedSlots();
-    const countToFill = Math.min(tabs.length, chosenSlots.length);
-
-    for (let i = 0; i < countToFill; i++) {
-      const payload = buildPayload(chosenSlots[i]);
-      await chrome.scripting.executeScript({
-        target: { tabId: tabs[i].id },
-        world: "MAIN",
-        func: fillFrappeBulkForm,
-        args: [payload],
-      });
-    }
-
-    document.getElementById("status").textContent =
-      `✓ Done: Filled ${countToFill} tab(s) in this window.`;
   } finally {
     fillAllBtn.disabled = false;
   }

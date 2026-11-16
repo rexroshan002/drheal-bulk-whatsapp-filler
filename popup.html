@@ -4,9 +4,11 @@
     <meta charset="utf-8" />
     <style>
       :root {
-        --brand-primary: #6b21a8;
-        --brand-accent: #9333ea;
-        --brand-light: #f3e8ff;
+        --brand-red: #b91c1c;
+        --brand-red-dark: #7f1d1d;
+        --brand-gold: #f59e0b;
+        --brand-soft: #fef2f2;
+        --brand-border: #fecaca;
         --bg-canvas: #f8fafc;
         --card-bg: #ffffff;
         --border-subtle: #e2e8f0;
@@ -21,8 +23,24 @@
         box-sizing: border-box;
       }
 
+      /* Minimalistic Custom Scrollbar (Global & Containers) */
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.45);
+        border-radius: 999px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(185, 28, 28, 0.75);
+      }
+
       body {
-        width: 420px;
+        width: 430px;
         margin: 0;
         padding: 0;
         font-family:
@@ -31,26 +49,76 @@
         color: var(--text-main);
       }
 
-      /* Header */
+      /* Header with REX Logo & Hover Motion */
       .header {
-        background: linear-gradient(135deg, #581c87 0%, #7e22ce 100%);
+        background: linear-gradient(
+          135deg,
+          #450a0a 0%,
+          #991b1b 55%,
+          #b91c1c 100%
+        );
         color: #ffffff;
-        padding: 12px 16px;
+        padding: 11px 15px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        box-shadow: 0 2px 8px rgba(127, 29, 29, 0.22);
+      }
+      .brand-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .logo-wrap {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        overflow: hidden;
+        border: 1.5px solid rgba(251, 191, 36, 0.65);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        transition:
+          transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+          box-shadow 0.28s ease;
+        flex-shrink: 0;
+      }
+      .logo-wrap:hover {
+        transform: scale(1.12) rotate(-5deg);
+        box-shadow: 0 4px 12px rgba(251, 191, 36, 0.45);
+      }
+      .logo-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .header-text {
+        display: flex;
+        flex-direction: column;
       }
       .header-title {
-        font-size: 14px;
+        font-size: 13.5px;
         font-weight: 700;
         letter-spacing: 0.2px;
       }
+      .header-sub {
+        font-size: 10px;
+        color: #fecaca;
+        font-weight: 500;
+      }
       .header-badge {
-        background: rgba(255, 255, 255, 0.18);
-        padding: 3px 8px;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 4px 9px;
         border-radius: 999px;
         font-size: 10px;
-        font-weight: 600;
+        font-weight: 700;
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease;
+      }
+      .header-badge:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.22);
       }
 
       /* Main Layout */
@@ -64,9 +132,16 @@
       .card {
         background: var(--card-bg);
         border: 1px solid var(--border-subtle);
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 10px 12px;
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+      .card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
       }
 
       .row {
@@ -89,92 +164,175 @@
         margin-bottom: 4px;
       }
 
+      /* Custom Styled Dropdowns & Inputs */
+      .select-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .select-wrapper::after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        width: 7px;
+        height: 7px;
+        border-right: 2px solid var(--brand-red);
+        border-bottom: 2px solid var(--brand-red);
+        transform: rotate(45deg) translateY(-2px);
+        pointer-events: none;
+        transition: transform 0.2s ease;
+      }
+      .select-wrapper:hover::after {
+        transform: rotate(45deg) translateY(0px);
+      }
+
       select,
       input[type="text"] {
         width: 100%;
-        padding: 6px 8px;
+        padding: 6px 9px;
         border: 1px solid #cbd5e1;
-        border-radius: 6px;
+        border-radius: 7px;
         font-size: 12px;
+        font-weight: 500;
         color: var(--text-main);
         background: #ffffff;
         transition:
-          border-color 0.15s,
-          box-shadow 0.15s;
+          border-color 0.18s ease,
+          box-shadow 0.18s ease,
+          transform 0.18s ease,
+          background-color 0.18s ease;
+      }
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 28px;
+        cursor: pointer;
+        background-image: linear-gradient(to bottom, #ffffff, #f8fafc);
+      }
+      select:hover,
+      input[type="text"]:hover {
+        border-color: #94a3b8;
+        background-color: #ffffff;
       }
       select:focus,
       input[type="text"]:focus {
         outline: none;
-        border-color: var(--brand-accent);
-        box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.15);
+        border-color: var(--brand-red);
+        box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12);
       }
 
-      /* Slot Selector */
+      /* Checkbox-Type Time Slots with Hover Motion */
       .section-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 6px;
+        margin-bottom: 7px;
       }
       .section-header label {
         margin-bottom: 0;
         color: var(--text-main);
       }
       .pill-btn {
-        background: var(--brand-light);
-        color: var(--brand-primary);
-        border: 1px solid #d8b4fe;
+        background: var(--brand-soft);
+        color: var(--brand-red);
+        border: 1px solid var(--brand-border);
         border-radius: 999px;
-        padding: 2px 9px;
+        padding: 2px 10px;
         font-size: 10px;
         font-weight: 700;
         cursor: pointer;
-        transition: background 0.15s;
+        transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
       }
       .pill-btn:hover {
-        background: #e9d5ff;
+        background: var(--brand-red);
+        color: #ffffff;
+        border-color: var(--brand-red);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(185, 28, 28, 0.25);
       }
 
       .slots-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 5px;
+        gap: 6px;
+        max-height: 118px;
+        overflow-y: auto;
+        padding: 2px;
       }
-      .slot-pill {
+      .slot-checkbox-card {
         display: flex;
         align-items: center;
-        gap: 5px;
-        padding: 5px 6px;
+        gap: 6px;
+        padding: 6px 7px;
         border: 1px solid var(--border-subtle);
-        border-radius: 6px;
+        border-radius: 7px;
         font-size: 11px;
         font-weight: 500;
-        cursor: pointer;
+        color: var(--text-main);
         background: #f8fafc;
-        transition: all 0.15s;
+        cursor: pointer;
         user-select: none;
+        transition:
+          transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+          border-color 0.18s ease,
+          background-color 0.18s ease,
+          box-shadow 0.18s ease;
       }
-      .slot-pill:hover {
-        border-color: #cbd5e1;
-        background: #f1f5f9;
+      .slot-checkbox-card:hover {
+        transform: translateY(-1.5px);
+        border-color: #fca5a5;
+        background: #ffffff;
+        box-shadow: 0 3px 8px rgba(185, 28, 28, 0.08);
       }
-      .slot-pill.active {
-        background: var(--brand-light);
-        border-color: var(--brand-accent);
-        color: var(--brand-primary);
+      .slot-checkbox-card:active {
+        transform: scale(0.97);
+      }
+      .slot-checkbox-card.active {
+        background: var(--brand-soft);
+        border-color: var(--brand-red);
+        color: var(--brand-red-dark);
         font-weight: 600;
+        box-shadow: 0 1px 4px rgba(185, 28, 28, 0.1);
       }
-      .slot-pill input {
+      /* Custom Styled Checkbox */
+      .slot-checkbox-card input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
         margin: 0;
-        accent-color: var(--brand-accent);
+        border: 1.5px solid #94a3b8;
+        border-radius: 4px;
+        background: #ffffff;
+        display: grid;
+        place-content: center;
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: all 0.16s ease;
+      }
+      .slot-checkbox-card:hover input[type="checkbox"] {
+        border-color: var(--brand-red);
+      }
+      .slot-checkbox-card input[type="checkbox"]:checked {
+        background: var(--brand-red);
+        border-color: var(--brand-red);
+      }
+      .slot-checkbox-card input[type="checkbox"]:checked::before {
+        content: "";
+        width: 7px;
+        height: 4px;
+        border-left: 2px solid #ffffff;
+        border-bottom: 2px solid #ffffff;
+        transform: rotate(-45deg) translate(0.5px, -0.5px);
       }
 
       /* Preview Section */
       .preview-card {
         background: var(--code-bg);
         color: var(--code-text);
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 10px 12px;
+        border: 1px solid #1e293b;
       }
       .preview-top {
         display: flex;
@@ -185,7 +343,7 @@
       .preview-label {
         font-size: 11px;
         font-weight: 700;
-        color: #c084fc;
+        color: #fca5a5;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -204,33 +362,43 @@
         padding: 3px 8px;
         border-radius: 4px;
         cursor: pointer;
+        transition: all 0.18s ease;
+      }
+      .mode-btn:hover:not(.active) {
+        color: #f8fafc;
       }
       .mode-btn.active {
-        background: var(--brand-accent);
+        background: var(--brand-red);
         color: #ffffff;
       }
 
       .preview-scroll {
-        max-height: 155px;
+        max-height: 150px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 8px;
-        padding-right: 2px;
-      }
-      .preview-scroll::-webkit-scrollbar {
-        width: 5px;
+        padding-right: 3px;
       }
       .preview-scroll::-webkit-scrollbar-thumb {
         background: #334155;
-        border-radius: 4px;
+      }
+      .preview-scroll::-webkit-scrollbar-thumb:hover {
+        background: #b91c1c;
       }
 
       .preview-block {
         background: #1e293b;
         border: 1px solid #334155;
-        border-radius: 6px;
+        border-radius: 7px;
         padding: 7px 9px;
+        transition:
+          border-color 0.18s ease,
+          transform 0.18s ease;
+      }
+      .preview-block:hover {
+        border-color: #64748b;
+        transform: translateX(2px);
       }
       .preview-block-header {
         display: flex;
@@ -243,7 +411,7 @@
       .tab-badge {
         font-size: 10px;
         font-weight: 700;
-        color: #38bdf8;
+        color: #fbbf24;
       }
       .tab-title-text {
         font-size: 11px;
@@ -260,7 +428,7 @@
         word-break: break-word;
       }
 
-      /* Action Buttons */
+      /* Action Buttons with Hover Motion */
       .actions {
         display: flex;
         gap: 8px;
@@ -269,31 +437,40 @@
         flex: 1;
         padding: 9px 12px;
         border: none;
-        border-radius: 6px;
+        border-radius: 7px;
         font-size: 12px;
         font-weight: 700;
         cursor: pointer;
         transition:
-          transform 0.05s,
-          opacity 0.15s;
+          transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+          box-shadow 0.18s ease,
+          opacity 0.15s ease;
       }
-      .btn:active {
-        transform: scale(0.99);
+      .btn:hover:not(:disabled) {
+        transform: translateY(-1.5px);
+      }
+      .btn:active:not(:disabled) {
+        transform: scale(0.98);
       }
       .btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
       }
       .btn-primary {
-        background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+        background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
         color: #ffffff;
+        box-shadow: 0 2px 6px rgba(185, 28, 28, 0.25);
+      }
+      .btn-primary:hover:not(:disabled) {
+        box-shadow: 0 5px 14px rgba(185, 28, 28, 0.35);
       }
       .btn-secondary {
         background: #0f172a;
         color: #ffffff;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
       }
-      .btn:hover:not(:disabled) {
-        opacity: 0.92;
+      .btn-secondary:hover:not(:disabled) {
+        box-shadow: 0 5px 14px rgba(15, 23, 42, 0.3);
       }
 
       /* Status Bar */
@@ -308,7 +485,15 @@
   </head>
   <body>
     <div class="header">
-      <div class="header-title">Dr. Heal Bulk WhatsApp Filler</div>
+      <div class="brand-group">
+        <div class="logo-wrap" title="REX Form Assistant">
+          <img src="./logo.jpeg" alt="REX Logo" />
+        </div>
+        <div class="header-text">
+          <div class="header-title">Dr. Heal Bulk Filler</div>
+          <div class="header-sub">REX Automation Assistant</div>
+        </div>
+      </div>
       <div class="header-badge" id="selectedCountBadge">1 Slot Selected</div>
     </div>
 
@@ -318,20 +503,24 @@
         <div class="row">
           <div class="col">
             <label for="branch">Branch</label>
-            <select id="branch">
-              <option value="HSR">HSR Layout</option>
-              <option value="BSK">Banashankari (BSK)</option>
-            </select>
+            <div class="select-wrapper">
+              <select id="branch">
+                <option value="HSR">HSR Layout</option>
+                <option value="BSK">Banashankari (BSK)</option>
+              </select>
+            </div>
           </div>
           <div class="col">
             <label for="category">Template Type</label>
-            <select id="category">
-              <option value="first_en">1st Visit - English</option>
-              <option value="first_kn">1st Visit - Kannada</option>
-              <option value="followup">Follow-up (Senior Drs)</option>
-              <option value="fcfs_en">FCFS - English</option>
-              <option value="fcfs_kn">FCFS - Kannada</option>
-            </select>
+            <div class="select-wrapper">
+              <select id="category">
+                <option value="first_en">1st Visit - English</option>
+                <option value="first_kn">1st Visit - Kannada</option>
+                <option value="followup">Follow-up (Senior Drs)</option>
+                <option value="fcfs_en">FCFS - English</option>
+                <option value="fcfs_kn">FCFS - Kannada</option>
+              </select>
+            </div>
           </div>
         </div>
 

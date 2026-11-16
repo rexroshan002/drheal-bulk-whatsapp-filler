@@ -1,11 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "Dr. Heal Bulk WhatsApp Form Filler",
-  "version": "1.0",
-  "description": "Fills Title, Use Template, and Template Variables across single or multiple tabs.",
+  "name": "REX - Dr. Heal Bulk WhatsApp Form Filler",
+  "version": "1.1",
+  "description": "Fills Title, Use Template, and Template Variables across single or multiple tabs in the active window.",
+  "icons": {
+    "16": "./logo.jpeg",
+    "48": "./logo.jpeg",
+    "128": "./logo.jpeg"
+  },
   "permissions": ["tabs", "scripting"],
   "host_permissions": ["*://*.drheal.in/*"],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "./logo.jpeg"
   }
 }

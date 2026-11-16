@@ -1,0 +1,401 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --brand-primary: #6b21a8;
+        --brand-accent: #9333ea;
+        --brand-light: #f3e8ff;
+        --bg-canvas: #f8fafc;
+        --card-bg: #ffffff;
+        --border-subtle: #e2e8f0;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --code-bg: #0f172a;
+        --code-text: #e2e8f0;
+        --success: #059669;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 420px;
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg-canvas);
+        color: var(--text-main);
+      }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, #581c87 0%, #7e22ce 100%);
+        color: #ffffff;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .header-title {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+      .header-badge {
+        background: rgba(255, 255, 255, 0.18);
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      /* Main Layout */
+      .container {
+        padding: 12px 14px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        padding: 10px 12px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      }
+
+      .row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .row:last-child {
+        margin-bottom: 0;
+      }
+      .col {
+        flex: 1;
+      }
+
+      label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+
+      select,
+      input[type="text"] {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 12px;
+        color: var(--text-main);
+        background: #ffffff;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      select:focus,
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--brand-accent);
+        box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.15);
+      }
+
+      /* Slot Selector */
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+      .section-header label {
+        margin-bottom: 0;
+        color: var(--text-main);
+      }
+      .pill-btn {
+        background: var(--brand-light);
+        color: var(--brand-primary);
+        border: 1px solid #d8b4fe;
+        border-radius: 999px;
+        padding: 2px 9px;
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .pill-btn:hover {
+        background: #e9d5ff;
+      }
+
+      .slots-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+      }
+      .slot-pill {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 6px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        background: #f8fafc;
+        transition: all 0.15s;
+        user-select: none;
+      }
+      .slot-pill:hover {
+        border-color: #cbd5e1;
+        background: #f1f5f9;
+      }
+      .slot-pill.active {
+        background: var(--brand-light);
+        border-color: var(--brand-accent);
+        color: var(--brand-primary);
+        font-weight: 600;
+      }
+      .slot-pill input {
+        margin: 0;
+        accent-color: var(--brand-accent);
+      }
+
+      /* Preview Section */
+      .preview-card {
+        background: var(--code-bg);
+        color: var(--code-text);
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+      .preview-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .preview-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #c084fc;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .mode-toggle {
+        display: flex;
+        background: #1e293b;
+        border-radius: 6px;
+        padding: 2px;
+      }
+      .mode-btn {
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .mode-btn.active {
+        background: var(--brand-accent);
+        color: #ffffff;
+      }
+
+      .preview-scroll {
+        max-height: 155px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 2px;
+      }
+      .preview-scroll::-webkit-scrollbar {
+        width: 5px;
+      }
+      .preview-scroll::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 4px;
+      }
+
+      .preview-block {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        padding: 7px 9px;
+      }
+      .preview-block-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #334155;
+      }
+      .tab-badge {
+        font-size: 10px;
+        font-weight: 700;
+        color: #38bdf8;
+      }
+      .tab-title-text {
+        font-size: 11px;
+        font-weight: 600;
+        color: #f8fafc;
+      }
+      .json-code {
+        margin: 0;
+        font-family: "Cascadia Code", Consolas, monospace;
+        font-size: 10.5px;
+        line-height: 1.4;
+        color: #a7f3d0;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      /* Action Buttons */
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+      .btn {
+        flex: 1;
+        padding: 9px 12px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          transform 0.05s,
+          opacity 0.15s;
+      }
+      .btn:active {
+        transform: scale(0.99);
+      }
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+        color: #ffffff;
+      }
+      .btn-secondary {
+        background: #0f172a;
+        color: #ffffff;
+      }
+      .btn:hover:not(:disabled) {
+        opacity: 0.92;
+      }
+
+      /* Status Bar */
+      .status-bar {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--success);
+        text-align: center;
+        min-height: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-title">Dr. Heal Bulk WhatsApp Filler</div>
+      <div class="header-badge" id="selectedCountBadge">1 Slot Selected</div>
+    </div>
+
+    <div class="container">
+      <!-- Configuration Card -->
+      <div class="card">
+        <div class="row">
+          <div class="col">
+            <label for="branch">Branch</label>
+            <select id="branch">
+              <option value="HSR">HSR Layout</option>
+              <option value="BSK">Banashankari (BSK)</option>
+            </select>
+          </div>
+          <div class="col">
+            <label for="category">Template Type</label>
+            <select id="category">
+              <option value="first_en">1st Visit - English</option>
+              <option value="first_kn">1st Visit - Kannada</option>
+              <option value="followup">Follow-up (Senior Drs)</option>
+              <option value="fcfs_en">FCFS - English</option>
+              <option value="fcfs_kn">FCFS - Kannada</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="dateEn">Date (EN: DD-MM-YYYY)</label>
+            <input type="text" id="dateEn" />
+          </div>
+          <div class="col">
+            <label for="dateKn">Date (KN)</label>
+            <input type="text" id="dateKn" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="templateName">Template Name</label>
+            <input type="text" id="templateName" />
+          </div>
+          <div class="col" style="max-width: 110px">
+            <label for="variableType">Variable Type</label>
+            <input type="text" id="variableType" value="Common" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Slots Card -->
+      <div class="card">
+        <div class="section-header">
+          <label>Time Slots (1 slot per tab in current window)</label>
+          <button type="button" id="toggleAllSlots" class="pill-btn">
+            Select All
+          </button>
+        </div>
+        <div class="slots-grid" id="slotsContainer"></div>
+      </div>
+
+      <!-- Live Single / Multi-Tab JSON Preview -->
+      <div class="preview-card">
+        <div class="preview-top">
+          <span class="preview-label">Payload Preview</span>
+          <div class="mode-toggle">
+            <button type="button" class="mode-btn active" id="modeSingle">
+              Single Tab (1st)
+            </button>
+            <button type="button" class="mode-btn" id="modeMulti">
+              All Selected Tabs
+            </button>
+          </div>
+        </div>
+        <div class="preview-scroll" id="previewContainer"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button id="fillCurrent" class="btn btn-primary">
+          Fill Current Tab
+        </button>
+        <button id="fillAll" class="btn btn-secondary">Fill Window Tabs</button>
+      </div>
+
+      <div class="status-bar" id="status"></div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

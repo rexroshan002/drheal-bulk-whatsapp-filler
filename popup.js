@@ -98,7 +98,7 @@ const KN_MONTHS = [
   "ಡಿಸೆಂಬರ್",
 ];
 
-let previewMode = "single"; // "single" | "multi"
+let previewMode = "single";
 
 function getDefaultDates() {
   const d = new Date();
@@ -112,6 +112,16 @@ function getDefaultDates() {
   };
 }
 
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+// ==========================================
+// SERVICE 1: COMMON MULTI-TAB LOGIC
+// ==========================================
 function buildPayload(slotObj) {
   const branch = document.getElementById("branch").value;
   const category = document.getElementById("category").value;
@@ -183,10 +193,6 @@ function getSelectedSlots() {
   return checked.length ? checked : [SLOTS[0]];
 }
 
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 function refreshUI() {
   const allBoxes = [...document.querySelectorAll(".slot-cb")];
   allBoxes.forEach((cb) => {
@@ -237,11 +243,152 @@ function setPreviewMode(mode) {
   refreshUI();
 }
 
+// ==========================================
+// SERVICE 2: UNIQUE TOKEN & RECIPIENT ROWS
+// ==========================================
+function formatExcelTimeWindow(rawTime) {
+  const cleaned = rawTime.trim();
+  // If user already pasted a range like "11:30:00 AM - 12:30PM", keep it as-is
+  if (cleaned.includes("-")) return cleaned;
+
+  // Match 24-hour or 12-hour single time like "11:30:00" or "13:30:00" or "11:30"
+  const match = cleaned.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+  if (!match) return cleaned;
+
+  let hour = parseInt(match[1], 10);
+  const min = match[2];
+  const sec = match[3] || "00";
+  const mer = match[4] ? match[4].toUpperCase() : null;
+
+  if (mer === "PM" && hour < 12) hour += 12;
+  if (mer === "AM" && hour === 12) hour = 0;
+
+  const formatStart = (h24, m, s) => {
+    const suffix = h24 >= 12 ? "PM" : "AM";
+    const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+    return `${String(h12).padStart(2, "0")}:${m}:${s} ${suffix}`;
+  };
+
+  const formatEnd = (h24, m) => {
+    const suffix = h24 >= 12 ? "PM" : "AM";
+    const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+    return `${String(h12).padStart(2, "0")}:${m}${suffix}`;
+  };
+
+  const endHour = (hour + 1) % 24;
+  return `${formatStart(hour, min, sec)} - ${formatEnd(endHour, min)}`;
+}
+
+function parseUniqueRows() {
+  const raw = document.getElementById("excelPaste").value.trim();
+  if (!raw) return [];
+
+  const branch = document.getElementById("uBranch").value;
+  const dateStr = document.getElementById("uDate").value.trim();
+  const doctorName = document.getElementById("uDoctor").value; // Keep trailing space if user has it
+  const bInfo = BRANCHES[branch];
+
+  const lines = raw.split(/\r?\n/).filter((l) => l.trim());
+  const rows = [];
+
+  for (const line of lines) {
+    // Split by tab (Excel copy-paste) or 2+ spaces/comma
+    const parts = line.includes("\t")
+      ? line.split("\t").map((s) => s.trim())
+      : line.split(/\s{2,}|,/).map((s) => s.trim());
+
+    if (parts.length < 3) continue;
+    const [rawTime, rawToken, rawMobile] = parts;
+
+    // Skip header row if pasted (e.g. "Time | TOKEN NO | Mobile No")
+    if (/mobile|token/i.test(rawMobile) || /token/i.test(rawToken)) continue;
+
+    const mobile = rawMobile.replace(/\D/g, "");
+    if (!mobile) continue;
+
+    const timeRange = formatExcelTimeWindow(rawTime);
+    const jsonPayload = {
+      1: doctorName,
+      2: dateStr,
+      3: `${timeRange} || Token No: ${rawToken}`,
+      4: bInfo.enAddr,
+      5: bInfo.map,
+    };
+
+    rows.push({
+      mobile,
+      token: rawToken,
+      recipientData: JSON.stringify(jsonPayload, null, 2),
+    });
+  }
+
+  return rows;
+}
+
+function refreshUniquePreview() {
+  const rows = parseUniqueRows();
+  const activePaneIsUnique = document
+    .getElementById("uniquePane")
+    .classList.contains("active");
+
+  document.getElementById("uRowCount").textContent =
+    `${rows.length} Row(s) Ready`;
+  if (activePaneIsUnique) {
+    document.getElementById("selectedCountBadge").textContent =
+      `${rows.length} Row(s)`;
+  }
+
+  const container = document.getElementById("uPreviewContainer");
+  if (!rows.length) {
+    container.innerHTML = `<div class="json-code" style="color:#94a3b8;">Paste 3 columns from Excel (Time, Token No, Mobile No) above to preview...</div>`;
+    return;
+  }
+
+  container.innerHTML = rows
+    .slice(0, 25) // Render up to 25 blocks smoothly in preview
+    .map(
+      (r, idx) => `
+      <div class="preview-block">
+        <div class="preview-block-header">
+          <span class="tab-badge">ROW ${idx + 1} • TOKEN ${escapeHtml(r.token)}</span>
+          <span class="tab-title-text">${escapeHtml(r.mobile)}</span>
+        </div>
+        <pre class="json-code">${escapeHtml(r.recipientData)}</pre>
+      </div>
+    `,
+    )
+    .join("");
+}
+
+// ==========================================
+// INITIALIZATION & EVENT LISTENERS
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
   const dates = getDefaultDates();
   document.getElementById("dateEn").value = dates.en;
   document.getElementById("dateKn").value = dates.kn;
+  document.getElementById("uDate").value = dates.en;
 
+  // Service Switcher Tabs
+  document.querySelectorAll(".service-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document
+        .querySelectorAll(".service-tab")
+        .forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".view-pane")
+        .forEach((p) => p.classList.remove("active"));
+
+      btn.classList.add("active");
+      const targetId = btn.getAttribute("data-target");
+      document.getElementById(targetId).classList.add("active");
+
+      if (targetId === "uniquePane") refreshUniquePreview();
+      else refreshUI();
+    });
+  });
+
+  // Populate Service 1 Slots
   const container = document.getElementById("slotsContainer");
   SLOTS.forEach((slot, idx) => {
     const label = document.createElement("label");
@@ -252,7 +399,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   syncTemplateName();
   refreshUI();
+  refreshUniquePreview();
 
+  // Service 1 Listeners
   document
     .getElementById("modeSingle")
     .addEventListener("click", () => setPreviewMode("single"));
@@ -289,9 +438,27 @@ document.addEventListener("DOMContentLoaded", () => {
       refreshUI();
     }
   });
+
+  // Service 2 Listeners
+  ["uBranch", "uDate", "uDoctor", "uTemplate", "excelPaste"].forEach((id) => {
+    document.getElementById(id).addEventListener("input", refreshUniquePreview);
+  });
+
+  document.getElementById("uBranch").addEventListener("change", () => {
+    const b = document.getElementById("uBranch").value;
+    const docName = document.getElementById("uDoctor").value.trim();
+    document.getElementById("uTitle").value = `${b} - ${docName}`;
+  });
+
+  document.getElementById("clearPaste").addEventListener("click", () => {
+    document.getElementById("excelPaste").value = "";
+    refreshUniquePreview();
+  });
 });
 
-// Injected function executed once inside each target tab's MAIN world
+// ==========================================
+// INJECTED PAGE FUNCTIONS (MAIN WORLD)
+// ==========================================
 function fillFrappeBulkForm(data) {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -311,9 +478,7 @@ function fillFrappeBulkForm(data) {
     return true;
   }
 
-  // Non-blocking execution prevents Chrome background tab timer throttling from stalling the loop
   (async () => {
-    // 1. Set Title first
     if (window.cur_frm) {
       try {
         for (const df of cur_frm.meta.fields) {
@@ -330,7 +495,6 @@ function fillFrappeBulkForm(data) {
 
     await sleep(150);
 
-    // 2. Check "Use Template" (unchecked -> checked)
     if (window.cur_frm) {
       try {
         for (const df of cur_frm.meta.fields) {
@@ -350,7 +514,6 @@ function fillFrappeBulkForm(data) {
 
     await sleep(350);
 
-    // 3. Set Template & Variable Type
     if (window.cur_frm) {
       try {
         for (const df of cur_frm.meta.fields) {
@@ -373,7 +536,6 @@ function fillFrappeBulkForm(data) {
 
     await sleep(200);
 
-    // 4. Set Template Variables (Frappe Code / Ace Editor field)
     let varsSet = false;
     if (window.cur_frm) {
       try {
@@ -415,6 +577,89 @@ function fillFrappeBulkForm(data) {
   return true;
 }
 
+// Service 2 Injected Function: Fills Title, Use Template, Template, Variable Type="Unique", and Recipients Child Table
+function fillFrappeUniqueRecipients(payload) {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  (async () => {
+    if (!window.cur_frm) return;
+
+    // 1. Set Title
+    for (const df of cur_frm.meta.fields) {
+      if (df.label === "Title" || df.fieldname === "title") {
+        await cur_frm.set_value(df.fieldname, payload.title);
+      }
+    }
+    await sleep(120);
+
+    // 2. Check "Use Template"
+    for (const df of cur_frm.meta.fields) {
+      if (df.label === "Use Template" || df.fieldname === "use_template") {
+        await cur_frm.set_value(df.fieldname, 1);
+      }
+    }
+    await sleep(250);
+
+    // 3. Set Template Name and Variable Type = "Unique"
+    for (const df of cur_frm.meta.fields) {
+      if (df.label === "Template" || df.fieldname === "template") {
+        await cur_frm.set_value(df.fieldname, payload.templateName);
+      }
+      if (df.label === "Variable Type" || df.fieldname === "variable_type") {
+        await cur_frm.set_value(df.fieldname, "Unique");
+      }
+    }
+    await sleep(250);
+
+    // 4. Find the Recipients child table fieldname & its columns dynamically
+    const tableField = cur_frm.meta.fields.find(
+      (df) =>
+        df.fieldtype === "Table" &&
+        (df.label === "Recipients" || df.fieldname === "recipients"),
+    );
+    if (!tableField) return;
+
+    const tableName = tableField.fieldname;
+    const grid = cur_frm.fields_dict[tableName]?.grid;
+
+    let mobileCol = "mobile_number";
+    let dataCol = "recipient_data";
+
+    if (grid && grid.docfields) {
+      const mField = grid.docfields.find(
+        (f) =>
+          f.label === "Mobile Number" ||
+          f.fieldname.includes("mobile") ||
+          f.fieldname.includes("phone"),
+      );
+      const dField = grid.docfields.find(
+        (f) =>
+          f.label === "Recipient Data" ||
+          f.fieldname.includes("data") ||
+          f.fieldname.includes("variable"),
+      );
+      if (mField) mobileCol = mField.fieldname;
+      if (dField) dataCol = dField.fieldname;
+    }
+
+    // Clear existing empty rows and populate all Excel rows
+    cur_frm.clear_table(tableName);
+
+    for (const item of payload.rows) {
+      const row = cur_frm.add_child(tableName);
+      row[mobileCol] = item.mobile;
+      row[dataCol] = item.recipientData;
+    }
+
+    cur_frm.refresh_field(tableName);
+  })();
+
+  return true;
+}
+
+// ==========================================
+// BUTTON CLICK HANDLERS
+// ==========================================
 document.getElementById("fillCurrent").addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) return;
@@ -480,3 +725,36 @@ document.getElementById("fillAll").addEventListener("click", async () => {
     fillAllBtn.disabled = false;
   }
 });
+
+document
+  .getElementById("fillUniqueCurrent")
+  .addEventListener("click", async () => {
+    const rows = parseUniqueRows();
+    if (!rows.length) {
+      document.getElementById("status").textContent =
+        "Paste valid Excel rows (Time, Token No, Mobile) first.";
+      return;
+    }
+
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+    if (!tab) return;
+
+    const payload = {
+      title: document.getElementById("uTitle").value.trim(),
+      templateName: document.getElementById("uTemplate").value.trim(),
+      rows,
+    };
+
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      world: "MAIN",
+      func: fillFrappeUniqueRecipients,
+      args: [payload],
+    });
+
+    document.getElementById("status").textContent =
+      `✓ Added ${rows.length} recipient row(s) with Unique Token JSON!`;
+  });

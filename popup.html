@@ -6,7 +6,6 @@
       :root {
         --brand-red: #b91c1c;
         --brand-red-dark: #7f1d1d;
-        --brand-gold: #f59e0b;
         --brand-soft: #fef2f2;
         --brand-border: #fecaca;
         --bg-canvas: #f8fafc;
@@ -23,7 +22,6 @@
         box-sizing: border-box;
       }
 
-      /* Minimalistic Custom Scrollbar (Global & Containers) */
       ::-webkit-scrollbar {
         width: 4px;
         height: 4px;
@@ -40,7 +38,7 @@
       }
 
       body {
-        width: 430px;
+        width: 440px;
         margin: 0;
         padding: 0;
         font-family:
@@ -49,7 +47,7 @@
         color: var(--text-main);
       }
 
-      /* Header with REX Logo & Hover Motion */
+      /* Header */
       .header {
         background: linear-gradient(
           135deg,
@@ -112,18 +110,48 @@
         border-radius: 999px;
         font-size: 10px;
         font-weight: 700;
-        transition:
-          transform 0.2s ease,
-          background 0.2s ease;
       }
-      .header-badge:hover {
-        transform: translateY(-1px);
-        background: rgba(255, 255, 255, 0.22);
+
+      /* Service Mode Switcher */
+      .service-tabs {
+        display: flex;
+        background: #e2e8f0;
+        padding: 3px;
+        margin: 10px 14px 0;
+        border-radius: 8px;
+        gap: 4px;
+      }
+      .service-tab {
+        flex: 1;
+        padding: 6px 8px;
+        border: none;
+        border-radius: 6px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #475569;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.18s ease;
+      }
+      .service-tab:hover:not(.active) {
+        color: #0f172a;
+      }
+      .service-tab.active {
+        background: #ffffff;
+        color: var(--brand-red);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+      }
+
+      .view-pane {
+        display: none;
+      }
+      .view-pane.active {
+        display: block;
       }
 
       /* Main Layout */
       .container {
-        padding: 12px 14px 14px;
+        padding: 10px 14px 14px;
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -141,7 +169,6 @@
       }
       .card:hover {
         border-color: #cbd5e1;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
       }
 
       .row {
@@ -164,7 +191,6 @@
         margin-bottom: 4px;
       }
 
-      /* Custom Styled Dropdowns & Inputs */
       .select-wrapper {
         position: relative;
         display: flex;
@@ -182,12 +208,10 @@
         pointer-events: none;
         transition: transform 0.2s ease;
       }
-      .select-wrapper:hover::after {
-        transform: rotate(45deg) translateY(0px);
-      }
 
       select,
-      input[type="text"] {
+      input[type="text"],
+      textarea {
         width: 100%;
         padding: 6px 9px;
         border: 1px solid #cbd5e1;
@@ -198,9 +222,7 @@
         background: #ffffff;
         transition:
           border-color 0.18s ease,
-          box-shadow 0.18s ease,
-          transform 0.18s ease,
-          background-color 0.18s ease;
+          box-shadow 0.18s ease;
       }
       select {
         appearance: none;
@@ -209,19 +231,23 @@
         cursor: pointer;
         background-image: linear-gradient(to bottom, #ffffff, #f8fafc);
       }
-      select:hover,
-      input[type="text"]:hover {
-        border-color: #94a3b8;
-        background-color: #ffffff;
+      textarea.excel-paste {
+        height: 88px;
+        font-family: "Cascadia Code", Consolas, monospace;
+        font-size: 11px;
+        line-height: 1.4;
+        resize: vertical;
+        white-space: pre;
       }
       select:focus,
-      input[type="text"]:focus {
+      input[type="text"]:focus,
+      textarea:focus {
         outline: none;
         border-color: var(--brand-red);
         box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12);
       }
 
-      /* Checkbox-Type Time Slots with Hover Motion */
+      /* Slot Selector */
       .section-header {
         display: flex;
         justify-content: space-between;
@@ -241,21 +267,19 @@
         font-size: 10px;
         font-weight: 700;
         cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: all 0.2s ease;
       }
       .pill-btn:hover {
         background: var(--brand-red);
         color: #ffffff;
         border-color: var(--brand-red);
-        transform: translateY(-1px);
-        box-shadow: 0 2px 6px rgba(185, 28, 28, 0.25);
       }
 
       .slots-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 6px;
-        max-height: 118px;
+        max-height: 115px;
         overflow-y: auto;
         padding: 2px;
       }
@@ -273,28 +297,21 @@
         cursor: pointer;
         user-select: none;
         transition:
-          transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
-          border-color 0.18s ease,
-          background-color 0.18s ease,
-          box-shadow 0.18s ease;
+          transform 0.16s ease,
+          border-color 0.16s ease,
+          background-color 0.16s ease;
       }
       .slot-checkbox-card:hover {
-        transform: translateY(-1.5px);
+        transform: translateY(-1px);
         border-color: #fca5a5;
         background: #ffffff;
-        box-shadow: 0 3px 8px rgba(185, 28, 28, 0.08);
-      }
-      .slot-checkbox-card:active {
-        transform: scale(0.97);
       }
       .slot-checkbox-card.active {
         background: var(--brand-soft);
         border-color: var(--brand-red);
         color: var(--brand-red-dark);
         font-weight: 600;
-        box-shadow: 0 1px 4px rgba(185, 28, 28, 0.1);
       }
-      /* Custom Styled Checkbox */
       .slot-checkbox-card input[type="checkbox"] {
         appearance: none;
         -webkit-appearance: none;
@@ -307,11 +324,6 @@
         display: grid;
         place-content: center;
         flex-shrink: 0;
-        cursor: pointer;
-        transition: all 0.16s ease;
-      }
-      .slot-checkbox-card:hover input[type="checkbox"] {
-        border-color: var(--brand-red);
       }
       .slot-checkbox-card input[type="checkbox"]:checked {
         background: var(--brand-red);
@@ -326,7 +338,7 @@
         transform: rotate(-45deg) translate(0.5px, -0.5px);
       }
 
-      /* Preview Section */
+      /* Preview Card */
       .preview-card {
         background: var(--code-bg);
         color: var(--code-text);
@@ -362,10 +374,6 @@
         padding: 3px 8px;
         border-radius: 4px;
         cursor: pointer;
-        transition: all 0.18s ease;
-      }
-      .mode-btn:hover:not(.active) {
-        color: #f8fafc;
       }
       .mode-btn.active {
         background: var(--brand-red);
@@ -373,32 +381,18 @@
       }
 
       .preview-scroll {
-        max-height: 150px;
+        max-height: 140px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 7px;
         padding-right: 3px;
       }
-      .preview-scroll::-webkit-scrollbar-thumb {
-        background: #334155;
-      }
-      .preview-scroll::-webkit-scrollbar-thumb:hover {
-        background: #b91c1c;
-      }
-
       .preview-block {
         background: #1e293b;
         border: 1px solid #334155;
         border-radius: 7px;
         padding: 7px 9px;
-        transition:
-          border-color 0.18s ease,
-          transform 0.18s ease;
-      }
-      .preview-block:hover {
-        border-color: #64748b;
-        transform: translateX(2px);
       }
       .preview-block-header {
         display: flex;
@@ -428,7 +422,7 @@
         word-break: break-word;
       }
 
-      /* Action Buttons with Hover Motion */
+      /* Buttons */
       .actions {
         display: flex;
         gap: 8px;
@@ -442,15 +436,12 @@
         font-weight: 700;
         cursor: pointer;
         transition:
-          transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
-          box-shadow 0.18s ease,
+          transform 0.16s ease,
+          box-shadow 0.16s ease,
           opacity 0.15s ease;
       }
       .btn:hover:not(:disabled) {
         transform: translateY(-1.5px);
-      }
-      .btn:active:not(:disabled) {
-        transform: scale(0.98);
       }
       .btn:disabled {
         opacity: 0.5;
@@ -461,25 +452,18 @@
         color: #ffffff;
         box-shadow: 0 2px 6px rgba(185, 28, 28, 0.25);
       }
-      .btn-primary:hover:not(:disabled) {
-        box-shadow: 0 5px 14px rgba(185, 28, 28, 0.35);
-      }
       .btn-secondary {
         background: #0f172a;
         color: #ffffff;
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
-      }
-      .btn-secondary:hover:not(:disabled) {
-        box-shadow: 0 5px 14px rgba(15, 23, 42, 0.3);
       }
 
-      /* Status Bar */
       .status-bar {
         font-size: 11px;
         font-weight: 600;
         color: var(--success);
         text-align: center;
         min-height: 15px;
+        padding-bottom: 8px;
       }
     </style>
   </head>
@@ -487,7 +471,7 @@
     <div class="header">
       <div class="brand-group">
         <div class="logo-wrap" title="REX Form Assistant">
-          <img src="./logo.jpeg" alt="REX Logo" />
+          <img src="logo.jpg" alt="REX Logo" />
         </div>
         <div class="header-text">
           <div class="header-title">Dr. Heal Bulk Filler</div>
@@ -497,93 +481,183 @@
       <div class="header-badge" id="selectedCountBadge">1 Slot Selected</div>
     </div>
 
-    <div class="container">
-      <!-- Configuration Card -->
-      <div class="card">
-        <div class="row">
-          <div class="col">
-            <label for="branch">Branch</label>
-            <div class="select-wrapper">
-              <select id="branch">
-                <option value="HSR">HSR Layout</option>
-                <option value="BSK">Banashankari (BSK)</option>
-              </select>
+    <!-- Top Service Mode Switcher -->
+    <div class="service-tabs">
+      <button type="button" class="service-tab active" data-target="commonPane">
+        1. Common (Multi-Tab)
+      </button>
+      <button type="button" class="service-tab" data-target="uniquePane">
+        2. Unique Token (Excel Rows)
+      </button>
+    </div>
+
+    <!-- SERVICE 1: COMMON VARIABLE MULTI-TAB FILLER -->
+    <div id="commonPane" class="view-pane active">
+      <div class="container">
+        <div class="card">
+          <div class="row">
+            <div class="col">
+              <label for="branch">Branch</label>
+              <div class="select-wrapper">
+                <select id="branch">
+                  <option value="HSR">HSR Layout</option>
+                  <option value="BSK">Banashankari (BSK)</option>
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <label for="category">Template Type</label>
+              <div class="select-wrapper">
+                <select id="category">
+                  <option value="first_en">1st Visit - English</option>
+                  <option value="first_kn">1st Visit - Kannada</option>
+                  <option value="followup">Follow-up (Senior Drs)</option>
+                  <option value="fcfs_en">FCFS - English</option>
+                  <option value="fcfs_kn">FCFS - Kannada</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div class="col">
-            <label for="category">Template Type</label>
-            <div class="select-wrapper">
-              <select id="category">
-                <option value="first_en">1st Visit - English</option>
-                <option value="first_kn">1st Visit - Kannada</option>
-                <option value="followup">Follow-up (Senior Drs)</option>
-                <option value="fcfs_en">FCFS - English</option>
-                <option value="fcfs_kn">FCFS - Kannada</option>
-              </select>
+
+          <div class="row">
+            <div class="col">
+              <label for="dateEn">Date (EN: DD-MM-YYYY)</label>
+              <input type="text" id="dateEn" />
+            </div>
+            <div class="col">
+              <label for="dateKn">Date (KN)</label>
+              <input type="text" id="dateKn" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label for="templateName">Template Name</label>
+              <input type="text" id="templateName" />
+            </div>
+            <div class="col" style="max-width: 110px">
+              <label for="variableType">Variable Type</label>
+              <input type="text" id="variableType" value="Common" />
             </div>
           </div>
         </div>
 
-        <div class="row">
-          <div class="col">
-            <label for="dateEn">Date (EN: DD-MM-YYYY)</label>
-            <input type="text" id="dateEn" />
+        <div class="card">
+          <div class="section-header">
+            <label>Time Slots (1 slot per tab in current window)</label>
+            <button type="button" id="toggleAllSlots" class="pill-btn">
+              Select All
+            </button>
           </div>
-          <div class="col">
-            <label for="dateKn">Date (KN)</label>
-            <input type="text" id="dateKn" />
-          </div>
+          <div class="slots-grid" id="slotsContainer"></div>
         </div>
 
-        <div class="row">
-          <div class="col">
-            <label for="templateName">Template Name</label>
-            <input type="text" id="templateName" />
+        <div class="preview-card">
+          <div class="preview-top">
+            <span class="preview-label">Payload Preview</span>
+            <div class="mode-toggle">
+              <button type="button" class="mode-btn active" id="modeSingle">
+                Single Tab (1st)
+              </button>
+              <button type="button" class="mode-btn" id="modeMulti">
+                All Selected Tabs
+              </button>
+            </div>
           </div>
-          <div class="col" style="max-width: 110px">
-            <label for="variableType">Variable Type</label>
-            <input type="text" id="variableType" value="Common" />
-          </div>
+          <div class="preview-scroll" id="previewContainer"></div>
         </div>
-      </div>
 
-      <!-- Time Slots Card -->
-      <div class="card">
-        <div class="section-header">
-          <label>Time Slots (1 slot per tab in current window)</label>
-          <button type="button" id="toggleAllSlots" class="pill-btn">
-            Select All
+        <div class="actions">
+          <button id="fillCurrent" class="btn btn-primary">
+            Fill Current Tab
+          </button>
+          <button id="fillAll" class="btn btn-secondary">
+            Fill Window Tabs
           </button>
         </div>
-        <div class="slots-grid" id="slotsContainer"></div>
       </div>
+    </div>
 
-      <!-- Live Single / Multi-Tab JSON Preview -->
-      <div class="preview-card">
-        <div class="preview-top">
-          <span class="preview-label">Payload Preview</span>
-          <div class="mode-toggle">
-            <button type="button" class="mode-btn active" id="modeSingle">
-              Single Tab (1st)
-            </button>
-            <button type="button" class="mode-btn" id="modeMulti">
-              All Selected Tabs
-            </button>
+    <!-- SERVICE 2: UNIQUE TOKEN & MOBILE RECIPIENT TABLE FILLER -->
+    <div id="uniquePane" class="view-pane">
+      <div class="container">
+        <div class="card">
+          <div class="row">
+            <div class="col">
+              <label for="uBranch">Branch</label>
+              <div class="select-wrapper">
+                <select id="uBranch">
+                  <option value="HSR">HSR Layout</option>
+                  <option value="BSK">Banashankari (BSK)</option>
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <label for="uDate">Appointment Date</label>
+              <input type="text" id="uDate" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label for="uDoctor">Doctor Name ("1")</label>
+              <input
+                type="text"
+                id="uDoctor"
+                value="DR. RAKESH H JAYAPRAKASH "
+              />
+            </div>
+            <div class="col" style="max-width: 145px">
+              <label for="uTemplate">Template Name</label>
+              <input type="text" id="uTemplate" value="followup_short-" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label for="uTitle">Form Title</label>
+              <input
+                type="text"
+                id="uTitle"
+                value="HSR - DR. RAKESH H JAYAPRAKASH"
+              />
+            </div>
           </div>
         </div>
-        <div class="preview-scroll" id="previewContainer"></div>
-      </div>
 
-      <!-- Actions -->
-      <div class="actions">
-        <button id="fillCurrent" class="btn btn-primary">
-          Fill Current Tab
-        </button>
-        <button id="fillAll" class="btn btn-secondary">Fill Window Tabs</button>
-      </div>
+        <div class="card">
+          <div class="section-header">
+            <label for="excelPaste"
+              >Paste Excel Rows (Time | Token No | Mobile)</label
+            >
+            <button type="button" id="clearPaste" class="pill-btn">
+              Clear
+            </button>
+          </div>
+          <textarea
+            id="excelPaste"
+            class="excel-paste"
+            placeholder="11:30:00	23	8197785900&#10;12:30:00	29	7259192309"
+          ></textarea>
+        </div>
 
-      <div class="status-bar" id="status"></div>
+        <div class="preview-card">
+          <div class="preview-top">
+            <span class="preview-label">Recipient Rows Preview</span>
+            <span class="tab-badge" id="uRowCount">0 Rows Ready</span>
+          </div>
+          <div class="preview-scroll" id="uPreviewContainer"></div>
+        </div>
+
+        <div class="actions">
+          <button id="fillUniqueCurrent" class="btn btn-primary">
+            Fill Recipients in Current Tab
+          </button>
+        </div>
+      </div>
     </div>
+
+    <div class="status-bar" id="status"></div>
 
     <script src="popup.js"></script>
   </body>

@@ -180,9 +180,9 @@ function syncTemplateName() {
   if (category === "first_en" || category === "fcfs_en") {
     tplInput.value = "confimation2_new-";
   } else if (category === "first_kn" || category === "fcfs_kn") {
-    tplInput.value = "confimation_new_kan";
+    tplInput.value = "confimation_new_kan-";
   } else if (category === "followup") {
-    tplInput.value = "followup_confirmation";
+    tplInput.value = "followup_confirmation-";
   }
 }
 
